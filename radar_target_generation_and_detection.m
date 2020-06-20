@@ -36,9 +36,9 @@ TargetVelocity = 50;
 CarrierFrequency= 77e9;             %
 SweepTimeFactor = 5.5;
 
-BandWith      = SpeedOfLight / (2 * RangeResolution); % Bandwidth of the FMCW, Bsweep 
-Tchirp = (SweepTimeFactor*2*MaxRange)/SpeedOfLight; % Chirp Time of the FMCW
-Slope  = BandWith/Tchirp; % Slope of the FMCW
+BandWith      = SpeedOfLight / (2 * RangeResolution);   % Bandwidth of the FMCW, Bsweep 
+Tchirp = (SweepTimeFactor*2*MaxRange)/SpeedOfLight;     % Chirp Time of the FMCW
+Slope  = BandWith/Tchirp;                               % Slope of the FMCW
                                                           
 %The number of chirps in one sequence. Its ideal to have 2^ value for the ease of running the FFT
 %for Doppler Estimation. 
@@ -67,22 +67,12 @@ td = zeros(1,length(t));
 
 for i=1:length(t)         
     
-    
-    % *%TODO* :
-    %For each time stamp update the Range of the Target for constant velocity. 
     r_t(i) = TargetRange + (TargetVelocity*t(i)); % range_covered
     td(i) = (2*r_t(i)) / SpeedOfLight; % time delay
     
-    % *%TODO* :
-    %For each time sample we need update the transmitted and
-    %received signal. 
     Tx(i) = cos(2 * pi * (CarrierFrequency * t(i) + (Slope * t(i) ^ 2 / 2)));
     Rx (i) = cos(2 * pi * (CarrierFrequency * (t(i) - td(i)) + (Slope * (t(i) - td(i)) ^ 2 / 2)));
     
-    % *%TODO* :
-    %Now by mixing the Transmit and Receive generate the beat signal
-    %This is done by element wise matrix multiplication of Transmit and
-    %Receiver Signal
     Mix(i) = Tx(i).*Rx(i);
     
 end
@@ -100,13 +90,12 @@ Mix = reshape(Mix, [Nr, Nd]);
 %normalize.
 SigFFT1 = fft(Mix, Nr) ./ Nr;
 
- % *%TODO* :
 % Take the absolute value of FFT output
 SigFFT1 = abs(SigFFT1);  
 
  % *%TODO* :
-% Output of FFT is double sided signal, but we are interested in only one side of the spectrum.
-% Hence we throw out half of the samples.
+% Output of FFT is double sided signal, only one side of the spectrum is
+% needed, thus we throw out half of the samples.
 SigFFT1 = SigFFT1(1:Nr / 2);
 
 
@@ -114,7 +103,6 @@ SigFFT1 = SigFFT1(1:Nr / 2);
 figure ('Name','Range from First FFT')
 
 
- % *%TODO* :
  % plot FFT output 
 plot(SigFFT1);
  
@@ -139,14 +127,13 @@ Mix = reshape(Mix,[Nr,Nd]);
 % 2D FFT using the FFT size for both dimensions.
 SigFFT2 = fft2(Mix,Nr,Nd);
 
-% Taking just one side of signal from Range dimension.
+% Taking one side of signal from Range dimension.
 SigFFT2 = SigFFT2(1:Nr/2,1:Nd);
 SigFFT2 = fftshift (SigFFT2);
 RDM = abs(SigFFT2);
 RDM = 10*log10(RDM) ;
 
-%use the surf function to plot the output of 2DFFT and to show axis in both
-%dimensions
+% leverage the surf function to plot the output of 2DFFT and to show axis in both dimensions
 doppler_axis = linspace(-100,100,Nd);
 range_axis = linspace(-200,200,Nr/2)*((Nr/2)/400);
 figure,surf(doppler_axis,range_axis,RDM);
