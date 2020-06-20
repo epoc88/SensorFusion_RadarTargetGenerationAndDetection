@@ -1,7 +1,7 @@
 
 clear; close all; clc;
 
-%% Radar Specifications 
+%% Radar Specifications
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Frequency of operation = 77GHz
 % Max Range = 200m
@@ -25,7 +25,6 @@ TargetVelocity = 50;
 
 
 %% FMCW Waveform Generation
-
 % *%TODO* :
 %Design the FMCW waveform by giving the specs of each of its parameters.
 % Calculate the Bandwidth (B), Chirp Time (Tchirp) and Slope (slope) of the FMCW
